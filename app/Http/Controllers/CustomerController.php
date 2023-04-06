@@ -118,6 +118,9 @@ class CustomerController extends Controller
             ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%')
             ->count();
 
+            
+
+
             // $users = User::where('active','1')->where(function($query) {
             //     $query->where('email','jdoe@example.com')
             //                 ->orWhere('email','johndoe@example.com');

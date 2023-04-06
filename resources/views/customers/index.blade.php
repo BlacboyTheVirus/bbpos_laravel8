@@ -332,8 +332,11 @@
 
     
     <script>
+
+
         $('document').ready(function(){
 
+           
 
             ///////////////////////////////////////
             // Validate EDIT FORM
