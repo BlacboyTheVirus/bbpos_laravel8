@@ -42,9 +42,7 @@
                             <div class="card-title">
                                 <div class="row">
                                     <div class="col-md-12 ">
-                                        <div class="icheck-info d-inline">
-                                            &nbsp;
-                                          </div>   
+                                        <div class="icheck-info d-inline">&nbsp;</div>   
                                     </div>
 
                                     <div class="card-tools">
@@ -69,9 +67,9 @@
                                   <th class="exportable">Category</th>
                                   <th class="exportable">Expense for</th>
                                   <th class="exportable">Amount</th>
-                                  <th class="exportable" >Note</th>
-                                  <th class="exportable" >Reference</th>
-                                  <th class="exportable" >Created by</th>
+                                  <th class="exportable">Note</th>
+                                  <th class="exportable">Reference</th>
+                                  <th class="exportable">Created by</th>
                                   <th class="nosort"></th>
                                 </tr>
                                 </thead>
@@ -88,7 +86,7 @@
                                         <th class="exportable" style="text-align: right"></th>
                                         <th class="exportable" ></th>
                                         <th class="exportable" ></th>
-                                        <th class=" exportable" ></th>
+                                        <th class="exportable" ></th>
                                         <th class="nosort"></th> 
                                     </tr>
                                 </tfoot>
