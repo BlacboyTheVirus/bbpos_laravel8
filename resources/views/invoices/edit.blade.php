@@ -58,7 +58,7 @@
                                       <input id="invoice_id" name="invoice_id" value="{{$invoice->id}}" type="hidden">
 
                                       <span style="font-weight: 400; font-size:0.8rem">Invoice Code: </span> 
-                                      <span id="invoice-code-label">{{ $invoice->invoice_code}}</span>
+                                      <span id="invoice-code-label" class="text-lg">{{ $invoice->invoice_code}}</span>
                                       <input type="hidden" id="invoice-code" name="invoice_code" value={{ $invoice->invoice_code }} >
                                       <input type="hidden" id="count-id" name="count_id"  value={{ $invoice->count_id }} >
 
