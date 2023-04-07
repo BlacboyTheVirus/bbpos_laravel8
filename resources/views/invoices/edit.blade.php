@@ -324,14 +324,14 @@
                                         <div class="row bg-gray-light" style="padding: 4px">
                                             
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="form-group ">
                                                         <label for="customer_name">Payment Amount</label>
                                                         <input type="text" class="form-control form-control-border text-sm numonly" id="amount_paid" name="amount_paid" placeholder="Enter Amount Paid" value="0.00">
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="form-group ">
                                                         <label for="customer_name">Payment Type</label>
                                                         <select class="form-control form-control-border text-sm" id="payment-type" name="payment_type" placeholder="Select Payment Type">
@@ -339,6 +339,18 @@
                                                             <option value="pos">POS</option>
                                                             <option value="bank">Bank</option>
                                                         </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Date:</label>
+                                                        <div class="input-group date" id="payment-date" data-target-input="nearest">
+                                                            <input type="text" class="form-control text-sm " name="payment_date" id="payment-date" placeholder="Payment Date" value="" readonly required style="background: #fff !important">
+                                                            <div class="input-group-append" data-target="#payment-date" data-toggle="datetimepicker">
+                                                                <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -743,16 +755,24 @@
             });
 
             
-            //Date picker
-            $('#invoice-date').datepicker({
+            $('#invoice-date, #payment-date').datepicker({
                 format: "dd-mm-yyyy",
                 toggleActive: false,
                 autoclose: true,
                 todayHighlight: true               
             });
 
-            // $('#invoice-date').datepicker("setDate", new Date());
+            $('#payment-date').datepicker("setDate", new Date());
 
+            $("#invoice-date").datepicker().on("show", function(e) {
+            var top = $(".main-header").height() + parseInt($(".datepicker").css("top")) + 15;
+            $(".datepicker").css("top", top);
+            });
+
+            $("#payment-date").datepicker().on("show", function(e) {
+            var top = $(".main-header").height() + parseInt($(".datepicker").css("top")) + 15;
+            $(".datepicker").css("top", top);
+            });
 
          
             $('#customer-id').select2({

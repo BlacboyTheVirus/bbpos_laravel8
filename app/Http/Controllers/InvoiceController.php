@@ -76,6 +76,7 @@ class InvoiceController extends Controller
         $roundoff = $request->roundoff;
         $grandtotal = $request->grandtotal;
         $amount_paid = $request->amount_paid;
+        $payment_date = Carbon::parse($request->payment_date)->format('Y-m-d');
         $amount_due = $grandtotal - $amount_paid; 
        
 
@@ -152,7 +153,7 @@ class InvoiceController extends Controller
             if ($amount_paid > 0) {
                 $invoice->payments()->create([
                     'invoice_id'      => $last_invoice_id,
-                    'payment_date'    => $invoice_date,
+                    'payment_date'    => $payment_date,
                     'payment_type'    => $payment_type,
                     'amount'          => $amount_paid,
                     'payment_note'    => $payment_note,
@@ -213,6 +214,7 @@ class InvoiceController extends Controller
         $roundoff = $request->roundoff;
         $grandtotal = $request->grandtotal;
         $amount_paid = $request->amount_paid;
+        $payment_date = Carbon::parse($request->payment_date)->format('Y-m-d');
         $amount_due = $grandtotal - $amount_paid; 
 
             if ($amount_due <= 0) {
@@ -311,7 +313,7 @@ class InvoiceController extends Controller
             if ($amount_paid > 0){
                 $invoice->payments()->create([
                     'invoice_id'      => $last_invoice_id,
-                    'payment_date'    => $invoice_date,
+                    'payment_date'    => $payment_date,
                     'payment_type'    => $payment_type,
                     'amount'          => $amount_paid,
                     'payment_note'    => $payment_note,
