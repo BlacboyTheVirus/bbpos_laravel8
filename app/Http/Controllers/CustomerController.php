@@ -109,7 +109,13 @@ class CustomerController extends Controller
         // Total records
         $totalRecords = Customer::select('count(*) as allcount')->count();
 
-        $totalRecordswithFilter = Customer::select('count(*) as allcount')
+       
+
+        
+    if ($show_account_receivable == "unchecked") {
+
+         // Total records with filter
+         $totalRecordswithFilter = Customer::select('count(*) as allcount')
             ->where('customer_code', 'like', '%' . $searchValue . '%')
             ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
             ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
@@ -117,14 +123,6 @@ class CustomerController extends Controller
             ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
             ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%')
             ->count();
-
-            
-
-
-            // $users = User::where('active','1')->where(function($query) {
-            //     $query->where('email','jdoe@example.com')
-            //                 ->orWhere('email','johndoe@example.com');
-            // })->get();
 
         // Fetch records
         $records = Customer::orderBy($columnName, $columnSortOrder)
@@ -138,11 +136,35 @@ class CustomerController extends Controller
             ->skip($start)
             ->take($rowperpage)
             ->get();
+    } else {
 
+         // Total records with filter
+         $totalRecordswithFilter = Customer::select('count(*) as allcount')
+         ->whereRaw('(customer_amount_due + customer_invoice_due) > 0')
+         ->where(function ($query) use ($searchValue) {
+            $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                ->orWhere('customer_email', 'like', '%' . $searchValue . '%');
+                })
+            ->count();
+
+        $records = Customer::orderBy($columnName, $columnSortOrder)
+            ->whereRaw('(customer_amount_due + customer_invoice_due) > 0')
+            ->where(function ($query) use ($searchValue) {
+                $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_email', 'like', '%' . $searchValue . '%');
+            })
+            ->select('*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"))
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
+    }
 
         $data_arr = array();
 
-       
 
         foreach ($records as $record) {
 
@@ -161,61 +183,30 @@ class CustomerController extends Controller
                 $paypreviousdue = "   <a class='dropdown-item' onclick='show_pay_previous(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>Pay Previous Due</a>";
             }
 
-
-            if ($show_account_receivable == 'checked') {
-                if (($total_dues) > 0) {
-                    $data_arr[] = array(
-                        "customer_code"         =>  $customer_code,
-                        "customer_name"         =>  $customer_name,
-                        "customer_phone"        =>  $customer_phone,
-                        "customer_email"        =>  $customer_email,
-                        "customer_amount_due"   =>  $customer_amount_due,
-                        "customer_invoice_due"  =>  $customer_invoice_due,
-                        "customer_invoice_due"  =>  $customer_invoice_due,
-                        "total_dues"             =>  $total_dues,
-                        "action"                =>  ($id <> 1)? "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
-                        <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                        <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                        ".$paypreviousdue."
-                        <div class='dropdown-divider'></div>
-                        <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
-                        </div></div>" :
-                         "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
-                        <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                        <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                        ".$paypreviousdue."
-                        </div></div>" ,
-                    );
-                    $totalRecords--;
-                    $totalRecordswithFilter--;
-                }
-            } else {
-                $data_arr[] = array(
-                    "customer_code"         =>  $customer_code,
-                    "customer_name"         =>  $customer_name,
-                    "customer_phone"        =>  $customer_phone,
-                    "customer_email"        =>  $customer_email,
-                    "customer_amount_due"   =>  $customer_amount_due,
-                    "customer_invoice_due"  =>  $customer_invoice_due,
-                    "total_dues"             =>  $total_dues,
-                    "action"                =>  ($id <> 1) ? "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
-                    <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                    <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                    ".$paypreviousdue."
-                    <div class='dropdown-divider'></div>
-                    <a class='dropdown-item' onclick = 'delete_customer(" .$id. ")' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
-                    </div></div>": 
+            $data_arr[] = array(
+                "customer_code"         =>  $customer_code,
+                "customer_name"         =>  $customer_name,
+                "customer_phone"        =>  $customer_phone,
+                "customer_email"        =>  $customer_email,
+                "customer_amount_due"   =>  $customer_amount_due,
+                "customer_invoice_due"  =>  $customer_invoice_due,
+                "customer_invoice_due"  =>  $customer_invoice_due,
+                "total_dues"             =>  $total_dues,
+                "action"                =>  ($id <> 1)? "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
+                <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
+                <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
+                ".$paypreviousdue."
+                <div class='dropdown-divider'></div>
+                <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
+                </div></div>" :
                     "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
-                    <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                    <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                    ".$paypreviousdue."
-                   
-                    </div></div>",
-                );
-            }// end if show account recievables
-
-
-        }
+                <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
+                <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
+                ".$paypreviousdue."
+                </div></div>" ,
+            );
+   
+        } //end foreach
 
         $response = array(
             "draw" => intval($draw),
