@@ -55,7 +55,7 @@
                                 <div class="row">
                                     <div class="col-md-12 text-bold ">
                                       <span style="font-weight: 400; font-size:0.8rem">Invoice Code: </span> 
-                                      <span id="invoice-code-label">IN-0000</span>
+                                      <span id="invoice-code-label" class="text-lg">IN-0000</span>
                                       <input type="hidden" id="invoice-code" name="invoice_code" >
                                       <input type="hidden" id="count-id" name="count_id" >
 
