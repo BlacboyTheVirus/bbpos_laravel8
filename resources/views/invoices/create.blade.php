@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+<title>{{ config('app.name', 'Laravel') }} - New Invoice</title>
+@endsection
+
 @section('styles')
   <!-- DataTables -->
   <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
@@ -651,6 +655,11 @@
             });
 
             $('#invoice-date').datepicker("setDate", new Date());
+
+            $("#invoice-date").datepicker().on("show", function(e) {
+            var top = $(".main-header").height() + parseInt($(".datepicker").css("top")) + 15;
+            $(".datepicker").css("top", top);
+            });
 
 
          

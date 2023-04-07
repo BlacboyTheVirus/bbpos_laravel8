@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+<title>{{ config('app.name', 'Laravel') }} - Expense Categories</title>
+@endsection
+
 @section('styles')
   <!-- DataTables -->
   <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">

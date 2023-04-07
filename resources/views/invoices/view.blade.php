@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+<title>{{ config('app.name', 'Laravel') }} - Invoice</title>
+@endsection
+
 @section('styles')
 @endsection
 

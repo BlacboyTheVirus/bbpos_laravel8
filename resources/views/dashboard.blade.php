@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title')
+<title>{{ config('app.name', 'Laravel') }} - Dashboard</title>
+@endsection
+
 @section('content')
     <!-- Content Header (Page header) -->
     <div class="content-header">
