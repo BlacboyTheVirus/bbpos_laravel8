@@ -734,13 +734,13 @@
                  }
             });
 
-            $('#discount').on('change  select contextmenu drop', function(e){
-                  if (isNaN($(this).val())){
-                        $(this).val(0.00);
-                        calculatetotal();
-                        return false;
-                 }
-            });
+            // $('#discount').on('change  select contextmenu drop', function(e){
+            //       if (isNaN($(this).val())){
+            //             $(this).val(0.00);
+            //             calculatetotal();
+            //             return false;
+            //      }
+            // });
 
 
         }); //end Document Ready
@@ -786,7 +786,8 @@
     
     function calculatetotal(){
             var discount = parseFloat($('#discount').val());
-            $('#discount').val( discount.toLocaleString("en-US", {minimumFractionDigits:2}) )
+            // $('#discount').val( discount.toLocaleString("en-US", {minimumFractionDigits:2}) )
+            $('#discount').val( discount );
         
             var subtotal = 0;
             var roundoff = 0;
