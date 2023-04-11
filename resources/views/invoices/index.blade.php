@@ -255,6 +255,7 @@
                     "initComplete": function(settings, json) {
                                     $(this).DataTable().buttons().container()
                                     .appendTo( ('#top'));
+                                    
                                     },
                     
                                     drawCallback: function () {

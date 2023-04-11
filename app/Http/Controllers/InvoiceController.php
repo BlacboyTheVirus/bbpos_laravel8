@@ -623,7 +623,7 @@ if ($old_customer_id != $customer_id){
                 ->get();
         }
 
-
+        
         $data_arr = array();
 
         foreach ($records as $record) {
