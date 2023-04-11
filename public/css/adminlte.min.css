@@ -37776,12 +37776,15 @@ select.form-control-sm~.select2-container--default {
 
 .text-sm .select2-container--default .select2-selection--single,
 select.form-control-sm~.select2-container--default .select2-selection--single {
-    height: calc(1.8125rem + 2px)
+    /* height: calc(1.8125rem + 2px); */
+    height: calc(2.25rem + 2px);
+    
 }
 
 .text-sm .select2-container--default .select2-selection--single .select2-selection__rendered,
 select.form-control-sm~.select2-container--default .select2-selection--single .select2-selection__rendered {
-    margin-top: -.4rem
+    /* margin-top: -.4rem */
+    margin-top: 0rem
 }
 
 .text-sm .select2-container--default .select2-selection--single .select2-selection__arrow,

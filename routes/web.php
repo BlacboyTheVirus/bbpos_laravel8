@@ -82,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::get('expenses/category_delete/{id}', [ExpenseCategoryController::class, 'delete'])->name('expenses.category_delete');
     Route::post('expenses/category_update', [ExpenseCategoryController::class, 'update'])->name('expenses.category_update');
     Route::post('expenses/category_store', [ExpenseCategoryController::class, 'store'])->name('expenses.category_store');
+    Route::get('expenses/getcategories', [ExpenseCategoryController::class, 'getcategories'])->name('expenses.getcategories');
+    
     
 
 

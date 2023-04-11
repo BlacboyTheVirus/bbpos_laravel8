@@ -199,4 +199,30 @@ class ExpenseCategoryController extends Controller
 
 
 
+
+     ///////////////////////////////////////////////
+    /////// for Categories List
+    ///////////////////////////////////////////////
+
+    public function getcategories(Request $request) 
+    { 
+        $search = $request->search;
+        if($search == ''){
+            $categories = ExpenseCategory::orderby('category_name','asc')->select('id',  'category_name')->get();
+        }else{
+            $categories = ExpenseCategory::orderby('category_name','asc')->select('id', 'category_name')->where('category_name', 'like', '%' .$search . '%')->get();
+        }
+
+        $response = array();
+        foreach($categories as $category){
+            $response[] = array(
+                "id"=>$category->id,
+                "text"=>$category->category_name,
+            );
+        }
+        return response()->json($response);
+    }
+
+
+
 }

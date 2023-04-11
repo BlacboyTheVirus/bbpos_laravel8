@@ -13,6 +13,13 @@
 
   <!-- iCheck for checkboxes and radio inputs -->
   <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+
+   <!-- Select 2 -->
+   <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+   <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="{{ asset('plugins/datepicker/bootstrap-datepicker.css') }}">
  
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
@@ -63,6 +70,40 @@
                         
                         
                         <div class="card-body">
+
+                            <div class="row pb-2 mb-3">
+                               
+                                <div class="col-md-3">
+                                    <label>Expense Category</label>
+                                    <select class="form-control form-control-border" id="category_id" name="category_id" >
+                                        <option value='' selected="selected">-- Select Category --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label>From Date</label>
+                                    <div class="input-group date "  data-target-input="nearest">
+                                        <input type="text" class="form-control text-sm" name="expense_date_from" id="expense_date_from" placeholder="Invoice Date From" value="" readonly required style="background: #fff !important">
+                                          <div class="input-group-append" data-target="#expense_date_from" data-toggle="datetimepicker">
+                                              <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                          </div>
+                                      </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label>To Date</label>                                        
+                                    <div class="input-group date "  data-target-input="nearest">
+                                        <input type="text" class="form-control text-sm" name="expense_date_to" id="expense_date_to" placeholder="Invoice Date To" value="" readonly required style="background: #fff !important">
+                                          <div class="input-group-append" data-target="#expense_date_to" data-toggle="datetimepicker">
+                                              <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                          </div>
+                                      </div>
+                                </div>
+
+                        </div>
+
+
+
                             
                             <table id="expensesTable" class="table  table-hover">
                                 <thead>
@@ -198,127 +239,30 @@
     <!-- Toastr -->
     <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 
+     <!-- date-range-picker -->
+     <script src="{{ asset('plugins/datepicker/bootstrap-datepicker.min.js') }}"></script>
+
+     <!-- Select2 -->
+     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+
+
     
     <script>
         $('document').ready(function(){
 
-               //validate EDIT FORM
-              var editvalidator = $('#customers-edit-form').validate({
-                    rules: {
-                        customer_name: {
-                            required: true,
-                        },
-                        customer_phone: {
-                            required: false,
-                        },
-                        customer_email: {
-                            required: false,
-                            email: true,
-                        },
-                    },
-                    messages: {
-                        customer_email: {
-                            email: "Please enter a valid email address"
-                        },
-                    },
-                    errorElement: 'span',
-                    errorPlacement: function (error, element) {
-                        error.addClass('invalid-feedback');
-                        element.closest('.form-group').append(error);
-                    },
-                    highlight: function (element, errorClass, validClass) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function (element, errorClass, validClass) {
-                        $(element).removeClass('is-invalid');
-                    }
-                });
-
-             
-
-
-
-            /////////////////////////////////////////////
-            // Edit Button Clicked
-            ////////////////////////////////////////////
-            $( '#customerTable' ).on('click', ".edit-button", function(e){
-
-                e.preventDefault(); 
-                
-                $('#customers-edit-form').trigger('reset');
-
-                var customer_id = $(this).attr('id');
-                $('#customers-edit-form #customer_id').val( customer_id );
-                
-                //ajax call
-                $.ajaxSetup({
-                    headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() }
-                });
-
-                //populate edit form field
-                var url = "{{ route('customers.edit', ':customer_id') }}";
-                url = url.replace(':customer_id', customer_id);
-                $.get(url, function (edata) {
-                   $('#customers-edit-form #customer_name').val(edata.customer_name);
-                   $('#customers-edit-form #customer_phone').val(edata.customer_phone);
-                   $('#customers-edit-form #customer_email').val(edata.customer_email);
-                   $('#customers-edit-form #customer_amount_due').val(edata.customer_amount_due);
-                   $('#edit_customer_code').html(edata.customer_code);
-                }); //end get
-
-                
-                $('#modal-edit').modal('show'); 
-
-            });  // END EDIT BUTTON CLICKED
-
-
-            ////////////////////////////////////////////
-            // EDIT BUTTON CLICK TO SAVE
-            ///////////////////////////////////////////
-            $('#editSave').click(function(e){
-                e.preventDefault();
-                
-                if(!editvalidator.form()){
-                    return false;
-                };
-                
-                //submit
-                var formData = {
-                    id: $('#customer_id').val(),
-                    customer_name: $("#customers-edit-form #customer_name").val(),
-                    customer_phone: $("#customers-edit-form #customer_phone").val(),
-                    customer_email: $("#customers-edit-form #customer_email").val(),
-                    customer_amount_due: $("#customers-edit-form #customer_amount_due").val(),
-                };
-
-                $.ajaxSetup({
-                    headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() }
-                });
-
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('customers.update') }}',
-                    data: formData,
-                    dataType: "json",
-                    encode: true,
-                }).done(function (data) {
-                    if (data.status){
-                        $('#modal-edit').modal('hide'); 
-                        $('#customerTable').DataTable().ajax.reload();
-                        toastr.success(data.message);
-                    } else{
-                        toastr.error(data.message);
-                    }
-                });
-                
-            })
-            
+              
 
           
             /////////////////////////////////////////////
-            //Fetch all Customer Records for Datatable
+            //Fetch all Expenses  Records for Datatable
             ////////////////////////////////////////////
             function load_datatable(){
+
+                 category_id = $('#category_id').val();
+                 expense_date_from = $('#expense_date_from').val();
+                 expense_date_to = $('#expense_date_to').val();
+                 
+
                 table =   $('#expensesTable').DataTable({
                     processing: true,
                     serverSide: true,
@@ -332,7 +276,11 @@
                     info: true,
                     ajax: {
                         url: "{{route('expenses.ajax')}}",
-                        data: {}
+                        data: {
+                            'category_id': category_id,
+                            'expense_date_from': expense_date_from,
+                            'expense_date_to':  expense_date_to
+                        }
                     },
                     columns: [
                         { data: 'expenses_date' },
@@ -393,10 +341,63 @@
             
             load_datatable();
 
+
+            $("#category_id, #expense_date_from, #expense_date_to ").change(function() {
+                    $('#expensesTable').DataTable().destroy();
+                    load_datatable();
+            });
+
             //Positive Decimal
              $("#expenses_amount").inputFilter(function(value) {
                  return /^\d*[.]?\d{0,2}$/.test(value); 
             });
+
+
+
+             //Date picker
+             $('#expense_date_from, #expense_date_to').datepicker({
+                format: "dd-mm-yyyy",
+                toggleActive: false,
+                autoclose: true,
+                todayHighlight: true               
+            });
+
+            $("#expense_date_from, #expense_date_to").datepicker().on("show", function(e) {
+                var top = $(".main-header").height() + parseInt($(".datepicker").css("top")) + 15;
+                $(".datepicker").css("top", top);
+            });
+
+
+            $('#category_id').select2({
+                // minimumInputLength: 3,
+                allowClear: true,
+                placeholder: '--Select Category--',
+                ajax: { 
+                    headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() },
+                    url: "{{route('expenses.getcategories')}}",
+                    type: "get",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term // search term
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
+
+
 
         }); //end Document Ready
 

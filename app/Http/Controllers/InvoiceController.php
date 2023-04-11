@@ -536,52 +536,36 @@ if ($old_customer_id != $customer_id){
         $searchValue = $search_arr['value']; // Search value
 
         $show_account_receivable = $request->get('show_account_receivable');
-
+        $customer_id = $request->get('customer_id');
+        $invoice_date_from = $request->get('invoice_date_from');
+        $invoice_date_to = $request->get('invoice_date_to');
+        
         // Total records
         $totalRecords = DB::table('invoices')->select('count(*) as allcount')->count();
 
-        if ($show_account_receivable == "unchecked") {
-            $totalRecordswithFilter = DB::table('invoices')->select('count(*) as allcount')
-                ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-                ->where('invoice_code', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_date', 'like', '%' . $searchValue . '%')
-                ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_subtotal', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_discount', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_roundoff', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_grand_total', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_amount_paid', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_amount_due', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_note', 'like', '%' . $searchValue . '%')
-                ->orWhere('payment_status', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoices.created_by', 'like', '%' . $searchValue . '%')
-                ->count();
+        $filter ='invoices.id > 0';
+
+        if ($show_account_receivable == "checked") {
+            $filter .= ' AND invoice_amount_due > 0 ';
+        } 
+
+        if ($customer_id != "") {
+            $filter .= ' AND customer_id = "'.$customer_id.'"' ;
+        }  
+        
+        if ($invoice_date_from != "") {
+            $filter .= ' AND invoice_date >= "'.Carbon::parse($invoice_date_from)->format('Y-m-d').'"' ;
+        }  
+
+        if ($invoice_date_to != "") {
+            $filter .= ' AND invoice_date <= "'.Carbon::parse($invoice_date_to)->format('Y-m-d').'"' ;
+        }  
 
 
-            // Fetch records
-            $records = DB::table('invoices')->orderBy($columnName, $columnSortOrder)
-                ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-                ->where('invoice_code', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_date', 'like', '%' . $searchValue . '%')
-                ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_subtotal', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_discount', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_roundoff', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_grand_total', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_amount_paid', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_amount_due', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoice_note', 'like', '%' . $searchValue . '%')
-                ->orWhere('payment_status', 'like', '%' . $searchValue . '%')
-                ->orWhere('invoices.created_by', 'like', '%' . $searchValue . '%')
-                ->select('invoices.*', 'customers.customer_name')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
-        } else {
 
             $totalRecordswithFilter = DB::table('invoices')->select('count(*) as allcount')
                 ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-                ->whereRaw('invoice_amount_due > 0')
+                ->whereRaw($filter)
                 ->where(function ($query) use ($searchValue) {
                     $query->where('invoice_code', 'like', '%' . $searchValue . '%')
                     ->orWhere('invoice_date', 'like', '%' . $searchValue . '%')
@@ -598,11 +582,10 @@ if ($old_customer_id != $customer_id){
                 })
                 ->count();
 
-
             // Fetch records
             $records = DB::table('invoices')->orderBy($columnName, $columnSortOrder)
                 ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-                ->whereRaw('invoice_amount_due > 0')
+                ->whereRaw($filter)
                 ->where(function ($query) use ($searchValue) {
                     $query->where('invoice_code', 'like', '%' . $searchValue . '%')
                     ->orWhere('invoice_date', 'like', '%' . $searchValue . '%')
@@ -621,7 +604,7 @@ if ($old_customer_id != $customer_id){
                 ->skip($start)
                 ->take($rowperpage)
                 ->get();
-        }
+    
 
         
         $data_arr = array();

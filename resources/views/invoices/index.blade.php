@@ -14,6 +14,14 @@
   <!-- iCheck for checkboxes and radio inputs -->
   <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
  
+   <!-- Select 2 -->
+   <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+   <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+
+   <!-- daterange picker -->
+   <link rel="stylesheet" href="{{ asset('plugins/datepicker/bootstrap-datepicker.css') }}">
+
+
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
   
@@ -45,6 +53,7 @@
                         <div class="card-header">
                             <div class="card-title">
                                 <div class="row">
+                                    
                                     <div class="col-md-12 ">
                                         <div class="icheck-info d-inline">
                                             <input type="checkbox" id="amount-due-check" >
@@ -53,11 +62,11 @@
                                     </div>
 
                                     <div class="card-tools">
-                
                                         <a class="btn btn-block btn-success"  href="{{ route('invoices.create') }}">
                                             <i class="fa fa-plus"></i> New Invoice
                                         </a>
-                                      </div>
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -66,6 +75,38 @@
                         
                         
                         <div class="card-body">
+
+                            <div class="row pb-2 mb-3">
+                               
+                                    <div class="col-md-3">
+                                        <label>Customer Name</label>
+                                        <select class="form-control form-control-border" id="customer_id" name="customer_id" >
+                                            <option value='' selected="selected">-- Select Customer --</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>From Date</label>
+                                        <div class="input-group date "  data-target-input="nearest">
+                                            <input type="text" class="form-control text-sm" name="invoice_date_from" id="invoice_date_from" placeholder="Invoice Date From" value="" readonly required style="background: #fff !important">
+                                              <div class="input-group-append" data-target="#invoice_date_from" data-toggle="datetimepicker">
+                                                  <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                              </div>
+                                          </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>To Date</label>                                        
+                                        <div class="input-group date "  data-target-input="nearest">
+                                            <input type="text" class="form-control text-sm" name="invoice_date_to" id="invoice_date_to" placeholder="Invoice Date To" value="" readonly required style="background: #fff !important">
+                                              <div class="input-group-append" data-target="#invoice_date_to" data-toggle="datetimepicker">
+                                                  <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                              </div>
+                                          </div>
+                                    </div>
+
+                            </div>
+                                
                             
                             <table id="invoiceTable" class="table  table-hover">
                                 <thead>
@@ -174,15 +215,30 @@
     <!-- Toastr -->
     <script src="{{ asset('plugins/toastr/toastr.min.js') }}"></script>
 
+    <!-- date-range-picker -->
+    <script src="{{ asset('plugins/datepicker/bootstrap-datepicker.min.js') }}"></script>
+
+     <!-- Select2 -->
+     <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+
+    
     
     <script>
         $('document').ready(function(){
 
-           
+            
+
             /////////////////////////////////////////////
             //Fetch all Invoice Records for Datatable
             ////////////////////////////////////////////
-            function load_datatable(show_account_receivable ='unchecked'){
+            function load_datatable(){
+
+                 customer_id = $('#customer_id').val();
+                 invoice_date_from = $('#invoice_date_from').val();
+                 invoice_date_to = $('#invoice_date_to').val();
+                 show_account_receivable = $("#amount-due-check").is(":checked")?'checked':'unchecked';
+
+
                 table =   $('#invoiceTable').DataTable({
                     processing: true,
                     serverSide: true,
@@ -198,7 +254,10 @@
                     ajax: {
                         url: "{{route('invoices.ajax')}}",
                         data: {
-                            'show_account_receivable': show_account_receivable
+                            'show_account_receivable': show_account_receivable,
+                            'customer_id': customer_id,
+                            'invoice_date_from': invoice_date_from,
+                            'invoice_date_to':  invoice_date_to,
                         }
                     },
                     columns: [
@@ -285,24 +344,66 @@
                    
                 }); // end DataTable
             
-                $("#amount-due-check").change(function() {
-                    $('#invoiceTable').DataTable().destroy();
-                    if(this.checked){
-                        load_datatable('checked');
-                         
-                    } else {
-                        load_datatable();//default unchecked
-                    }
-                    
-                });
+                
             } // end load_datatable
              
             load_datatable();
+
+
+            $("#amount-due-check, #customer_id, #invoice_date_from, #invoice_date_to ").change(function() {
+                    $('#invoiceTable').DataTable().destroy();
+                    load_datatable();
+            });
 
             //Positive Decimal
             $("#customer_amount_due").inputFilter(function(value) {
                  return /^\d*[.]?\d{0,2}$/.test(value); 
             });
+
+
+            //Date picker
+            $('#invoice_date_from, #invoice_date_to').datepicker({
+                format: "dd-mm-yyyy",
+                toggleActive: false,
+                autoclose: true,
+                todayHighlight: true               
+            });
+
+            $("#invoice_date_from, #invoice_date_to").datepicker().on("show", function(e) {
+                var top = $(".main-header").height() + parseInt($(".datepicker").css("top")) + 15;
+                $(".datepicker").css("top", top);
+            });
+
+
+            $('#customer_id').select2({
+                // minimumInputLength: 3,
+                allowClear: true,
+                placeholder: '--Select Customer--',
+                ajax: { 
+                    headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() },
+                    url: "{{route('customers.getcustomers')}}",
+                    type: "post",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term // search term
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
+          
 
         }); //end Document Ready
 

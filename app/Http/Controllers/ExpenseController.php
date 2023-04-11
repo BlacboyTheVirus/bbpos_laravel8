@@ -92,18 +92,45 @@ class ExpenseController extends Controller
         $columnSortOrder = $order_arr[0]['dir']; // asc or desc
         $searchValue = $search_arr['value']; // Search value
 
+
+        $category_id = $request->get('category_id');
+        $expense_date_from = $request->get('expense_date_from');
+        $expense_date_to = $request->get('expense_date_to');
+        
+
         // Total records
         $totalRecords = DB::table('expenses')->select('count(*) as allcount')->count();
 
+
+        $filter ='expenses.id > 0';
+
+        
+        if ($category_id != "") {
+            $filter .= ' AND category_id = "'.$category_id.'"' ;
+        }  
+        
+        if ($expense_date_from != "") {
+            $filter .= ' AND expenses_date >= "'.Carbon::parse($expense_date_from)->format('Y-m-d').'"' ;
+        }  
+
+        if ($expense_date_to != "") {
+            $filter .= ' AND expenses_date <= "'.Carbon::parse($expense_date_to)->format('Y-m-d').'"' ;
+        }  
+
+
+
         $totalRecordswithFilter = DB::table('expenses')->select('count(*) as allcount')
             ->join('expense_categories', 'expenses.category_id', '=', 'expense_categories.id')
-            ->where('expenses_date', 'like', '%' . $searchValue . '%')
-            ->orWhere('category_name', 'like', '%' . $searchValue . '%')
-            ->orWhere('expenses_for', 'like', '%' . $searchValue . '%')
-            ->orWhere('expenses_amount', 'like', '%' . $searchValue . '%')
-            ->orWhere('expenses_reference', 'like', '%' . $searchValue . '%')
-            ->orWhere('expenses_note', 'like', '%' . $searchValue . '%')
-            ->orWhere('expenses_created_by', 'like', '%' . $searchValue . '%')
+            ->whereRaw($filter)
+            ->where(function ($query) use ($searchValue) {
+                $query->where('expenses_date', 'like', '%' . $searchValue . '%')
+                ->orWhere('category_name', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_for', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_amount', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_reference', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_note', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_created_by', 'like', '%' . $searchValue . '%');
+             })
             ->count();
 
 
@@ -111,13 +138,16 @@ class ExpenseController extends Controller
       
         $records = DB::table('expenses')->orderBy($columnName, $columnSortOrder)
         ->join('expense_categories', 'expenses.category_id', '=', 'expense_categories.id')
-        ->where('expenses_date', 'like', '%' . $searchValue . '%')
-        ->orWhere('category_name', 'like', '%' . $searchValue . '%')
-        ->orWhere('expenses_for', 'like', '%' . $searchValue . '%')
-        ->orWhere('expenses_amount', 'like', '%' . $searchValue . '%')
-        ->orWhere('expenses_reference', 'like', '%' . $searchValue . '%')
-        ->orWhere('expenses_note', 'like', '%' . $searchValue . '%')
-        ->orWhere('expenses_created_by', 'like', '%' . $searchValue . '%')
+        ->whereRaw($filter)
+            ->where(function ($query) use ($searchValue) {
+                $query->where('expenses_date', 'like', '%' . $searchValue . '%')
+                ->orWhere('category_name', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_for', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_amount', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_reference', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_note', 'like', '%' . $searchValue . '%')
+                ->orWhere('expenses_created_by', 'like', '%' . $searchValue . '%');
+            })
             ->select('expenses.*', 'expense_categories.category_name')
             ->skip($start)
             ->take($rowperpage)

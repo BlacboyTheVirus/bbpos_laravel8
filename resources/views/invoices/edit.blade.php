@@ -535,7 +535,7 @@
                         url: "{{ route('invoices.update') }}",
                         data:$("#invoice-form").serialize(), //only input
                         beforeSend: function(){
-                            $(".card-body").append('<div class="overlay"><i class="fas fa-circle-notch fa-spin text-lg"></i></div>');
+                            $(".card-body").append('<div class="overlay"><i class="fas fa-3x fa-sync-alt fa-spin"></i><div class="text-bold pt-2">Loading...</div></div>');
                         },
                         success: function(response){
                             $(".overlay").remove();

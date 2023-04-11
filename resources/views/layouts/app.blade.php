@@ -7,7 +7,7 @@
     @yield('title')
 
   <!-- Pace loader -->
-  <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+  <script src="{{ asset('plugins/pace-progress/pace.min.js') }}"></script>
   <link rel="stylesheet" href="{{ asset('css/pace_flash.css') }}">
 
     <!-- Google Font: Source Sans Pro -->
