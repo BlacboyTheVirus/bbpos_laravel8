@@ -74,6 +74,8 @@
                                   <th class="exportable">Name</th>
                                   <th class="exportable">Phone</th>
                                   <th class="exportable">Email</th>
+                                  <th class="exportable" style="text-align: right">Invoices </th>
+                                  <th class="exportable" style="text-align: right">Total Invoice</th>
                                   <th class="exportable" style="text-align: right">Previous Due</th>
                                   <th class="exportable" style="text-align: right">Sales Due</th>
                                   <th class="exportable" style="text-align: right">Total Due</th>
@@ -93,6 +95,8 @@
                                         <th class="exportable" style="text-align: right">Total</th>
                                         <th class="exportable" style="text-align: right"></th>
                                         <th class="exportable" style="text-align: right"></th>
+                                        <th class="exportable" style="text-align: right"></th>
+                                        <th class="exportable" style="text-align: right"></th>
                                         <th class=" exportable" style="text-align: right"></th>
                                         <th class="nosort"></th> 
                                     </tr>
@@ -110,9 +114,12 @@
     <!-- /.content -->
 
     <style>
+        #customerTable td:nth-child(4){text-align: right;}
         #customerTable td:nth-child(5){text-align: right;}
         #customerTable td:nth-child(6){text-align: right;}
         #customerTable td:nth-child(7){text-align: right;}
+        #customerTable td:nth-child(8){text-align: right;}
+        #customerTable td:nth-child(9){text-align: right;}
     </style>
 
     
@@ -660,6 +667,18 @@
                         { data: 'customer_name' },
                         { data: 'customer_phone' },
                         { data: 'customer_email' },
+                        { data: 'invoice_count', 
+                          sType: "numeric",
+                          render: function ( data, type, row, meta ) {
+                                         return ( parseFloat(data));
+                          }
+                        },
+                        { data: 'total_invoice', 
+                          sType: "numeric",
+                          render: function ( data, type, row, meta ) {
+                                         return ( parseFloat(data).toLocaleString(undefined, {minimumFractionDigits:2}) );
+                          }
+                        },
                         { data: 'customer_amount_due', 
                           sType: "numeric",
                           render: function ( data, type, row, meta ) {
@@ -709,20 +728,30 @@
                                         //to show first th
                                         $(api.column(3).footer()).html('Total');
 
-                                            sum = api.column(4, {page:'current'}).data().sum();
+                                        sum = api.column(4, {page:'current'}).data().sum();
                                             //to format this sum
-                                            formated = parseFloat(sum).toLocaleString( "en-US", {minimumFractionDigits:2});
-                                            $(api.column(4).footer()).html('₦ '+ formated);
+                                            formated = parseFloat(sum);
+                                            $(api.column(4).footer()).html(formated);
 
                                             sum = api.column(5, {page:'current'}).data().sum();
                                             //to format this sum
                                             formated = parseFloat(sum).toLocaleString( "en-US", {minimumFractionDigits:2});
                                             $(api.column(5).footer()).html('₦ '+ formated);
 
-                                             sum = api.column(6, {page:'current'}).data().sum();
+                                            sum = api.column(6, {page:'current'}).data().sum();
                                             //to format this sum
                                             formated = parseFloat(sum).toLocaleString( "en-US", {minimumFractionDigits:2});
                                             $(api.column(6).footer()).html('₦ '+ formated);
+
+                                             sum = api.column(7, {page:'current'}).data().sum();
+                                            //to format this sum
+                                            formated = parseFloat(sum).toLocaleString( "en-US", {minimumFractionDigits:2});
+                                            $(api.column(7).footer()).html('₦ '+ formated);
+
+                                            sum = api.column(8, {page:'current'}).data().sum();
+                                            //to format this sum
+                                            formated = parseFloat(sum).toLocaleString( "en-US", {minimumFractionDigits:2});
+                                            $(api.column(8).footer()).html('₦ '+ formated);
                                         
 		                             }
 

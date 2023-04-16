@@ -108,60 +108,51 @@ class CustomerController extends Controller
 
         // Total records
         $totalRecords = Customer::select('count(*) as allcount')->count();
+     
+        $filter ='customers.id > 0';
 
-       
+        if ($show_account_receivable == "checked") {
+            $filter .= ' AND invoice_amount_due > 0 ';
+        } 
 
-        
-    if ($show_account_receivable == "unchecked") {
-
+   
          // Total records with filter
-         $totalRecordswithFilter = Customer::select('count(*) as allcount')
-            ->where('customer_code', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%')
-            ->count();
+         $totalRecordswithFilter = DB::table('customers')
+         ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
+         ->whereRaw($filter)
+         ->where(function ($query) use ($searchValue) {
+             $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                 ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                 ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                 ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
+                 ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
+                 ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
+         })
+         ->distinct('customers.id')
+         ->count('customers.id as allcount');
+
+
+
+            
 
         // Fetch records
-        $records = Customer::orderBy($columnName, $columnSortOrder)
-            ->where('customer_code', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
-            ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%')
-            ->select('*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"))
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
-    } else {
-
-         // Total records with filter
-         $totalRecordswithFilter = Customer::select('count(*) as allcount')
-         ->whereRaw('(customer_amount_due + customer_invoice_due) > 0')
-         ->where(function ($query) use ($searchValue) {
-            $query->where('customer_code', 'like', '%' . $searchValue . '%')
-                ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-                ->orWhere('customer_email', 'like', '%' . $searchValue . '%');
+        $records = DB::table('customers')
+                ->orderBy($columnName, $columnSortOrder)
+                ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
+                ->whereRaw($filter)
+                ->where(function ($query) use ($searchValue) {
+                    $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                          ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                          ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                          ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
+                          ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
+                          ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
                 })
-            ->count();
-
-        $records = Customer::orderBy($columnName, $columnSortOrder)
-            ->whereRaw('(customer_amount_due + customer_invoice_due) > 0')
-            ->where(function ($query) use ($searchValue) {
-                $query->where('customer_code', 'like', '%' . $searchValue . '%')
-                    ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-                    ->orWhere('customer_email', 'like', '%' . $searchValue . '%');
-            })
-            ->select('*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"))
-            ->skip($start)
-            ->take($rowperpage)
-            ->get();
-    }
+                ->select('customers.*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"), DB::raw("sum(invoice_grand_total) as total_invoice"), DB::raw('COUNT(invoices.id) as invoice_count') )
+                ->groupBy('customers.id')
+                ->skip($start)
+                ->take($rowperpage)
+                ->get();
 
         $data_arr = array();
 
@@ -178,6 +169,9 @@ class CustomerController extends Controller
             $customer_amount_due = $record->customer_amount_due;
             $customer_invoice_due = $record->customer_invoice_due;
             $total_dues = $record->total_dues;
+            $total_invoice = $record->total_invoice;
+            $invoice_count = $record->invoice_count;
+
 
             if($customer_amount_due > 0){
                 $paypreviousdue = "   <a class='dropdown-item' onclick='show_pay_previous(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>Pay Previous Due</a>";
@@ -188,6 +182,9 @@ class CustomerController extends Controller
                 "customer_name"         =>  $customer_name,
                 "customer_phone"        =>  $customer_phone,
                 "customer_email"        =>  $customer_email,
+                "customer_email"        =>  $customer_email,
+                "invoice_count"        =>  $invoice_count,
+                "total_invoice"         =>  $total_invoice,
                 "customer_amount_due"   =>  $customer_amount_due,
                 "customer_invoice_due"  =>  $customer_invoice_due,
                 "customer_invoice_due"  =>  $customer_invoice_due,

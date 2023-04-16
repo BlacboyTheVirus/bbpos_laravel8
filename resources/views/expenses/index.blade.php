@@ -83,7 +83,7 @@
                                 <div class="col-md-3">
                                     <label>From Date</label>
                                     <div class="input-group date "  data-target-input="nearest">
-                                        <input type="text" class="form-control text-sm" name="expense_date_from" id="expense_date_from" placeholder="Invoice Date From" value="" readonly required style="background: #fff !important">
+                                        <input type="text" class="form-control text-sm" name="expense_date_from" id="expense_date_from" placeholder="Select Start Date" value="" readonly required style="background: #fff !important">
                                           <div class="input-group-append" data-target="#expense_date_from" data-toggle="datetimepicker">
                                               <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
                                           </div>
@@ -93,7 +93,7 @@
                                 <div class="col-md-3">
                                     <label>To Date</label>                                        
                                     <div class="input-group date "  data-target-input="nearest">
-                                        <input type="text" class="form-control text-sm" name="expense_date_to" id="expense_date_to" placeholder="Invoice Date To" value="" readonly required style="background: #fff !important">
+                                        <input type="text" class="form-control text-sm" name="expense_date_to" id="expense_date_to" placeholder="Select End Date" value="" readonly required style="background: #fff !important">
                                           <div class="input-group-append" data-target="#expense_date_to" data-toggle="datetimepicker">
                                               <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
                                           </div>
@@ -359,7 +359,8 @@
                 format: "dd-mm-yyyy",
                 toggleActive: false,
                 autoclose: true,
-                todayHighlight: true               
+                todayHighlight: true,
+                clearBtn: true       
             });
 
             $("#expense_date_from, #expense_date_to").datepicker().on("show", function(e) {

@@ -23,17 +23,23 @@ use App\Http\Controllers\ExpenseCategoryController;
 |
 */
 
+Route::get('/home', function () {
+    return redirect('dashboard');
+});
+
 Route::get('/', function () {
     return redirect('dashboard');
 });
 
-Auth::routes();
 
+Auth::routes();
 
 
 Route::middleware('auth')->group(function () {
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/gettabsdata', [DashboardController::class, 'gettabsdata'])->name('dashboard.gettabsdata');
+    Route::get('dashboard/barchartdata', [DashboardController::class, 'barchartdata'])->name('dashboard.barchartdata');
 
 
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
