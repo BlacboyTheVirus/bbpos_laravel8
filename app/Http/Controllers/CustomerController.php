@@ -23,27 +23,27 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::all();
-        return view ('customers.index', compact('customers'));
+        return view('customers.index', compact('customers'));
     }
 
     ///////////////////////////////////////////////
     /////// for Invoice form Customer List
     ///////////////////////////////////////////////
 
-    public function getcustomers(Request $request) 
-    { 
+    public function getcustomers(Request $request)
+    {
         $search = $request->search;
-        if($search == ''){
-            $customers = Customer::orderby('customer_code','asc')->select('id', 'customer_code', 'customer_name')->get();
-        }else{
-            $customers = Customer::orderby('customer_code','asc')->select('id', 'customer_code', 'customer_name')->where('customer_name', 'like', '%' .$search . '%')->get();
+        if ($search == '') {
+            $customers = Customer::orderby('customer_code', 'asc')->select('id', 'customer_code', 'customer_name')->get();
+        } else {
+            $customers = Customer::orderby('customer_code', 'asc')->select('id', 'customer_code', 'customer_name')->where('customer_name', 'like', '%' . $search . '%')->get();
         }
 
         $response = array();
-        foreach($customers as $customer){
+        foreach ($customers as $customer) {
             $response[] = array(
-                "id"=>$customer->id,
-                "text"=>$customer->customer_code . " | ". $customer->customer_name,
+                "id" => $customer->id,
+                "text" => $customer->customer_code . " | " . $customer->customer_name,
             );
         }
         return response()->json($response);
@@ -51,35 +51,35 @@ class CustomerController extends Controller
 
 
 
-     ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     /////// Amount due
     ///////////////////////////////////////////////
 
-    public function amountdue(Request $request) 
-    { 
+    public function amountdue(Request $request)
+    {
         $id = $request->id;
-        
+
         $dues = Customer::where('id', '=', $id)->get();
-       // dd($due);
+        // dd($due);
         foreach ($dues as $due) {
             $amountdue = $due->customer_amount_due + $due->customer_invoice_due;
         }
-            
-                return $amountdue;
+
+        return $amountdue;
     }
 
 
 
-     ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     /////// Amount due
     ///////////////////////////////////////////////
 
-    public function showpayprevious(Request $request) 
-    { 
+    public function showpayprevious(Request $request)
+    {
         $id = $request->id;
         $dues = Customer::where('id', '=', $id)->get();
         foreach ($dues as $due) {
-            $amountdue = $due->customer_amount_due ;
+            $amountdue = $due->customer_amount_due;
         }
         return $amountdue;
     }
@@ -108,51 +108,51 @@ class CustomerController extends Controller
 
         // Total records
         $totalRecords = Customer::select('count(*) as allcount')->count();
-     
-        $filter ='customers.id > 0';
+
+        $filter = 'customers.id > 0';
 
         if ($show_account_receivable == "checked") {
             $filter .= ' AND invoice_amount_due > 0 ';
-        } 
-
-   
-         // Total records with filter
-         $totalRecordswithFilter = DB::table('customers')
-         ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
-         ->whereRaw($filter)
-         ->where(function ($query) use ($searchValue) {
-             $query->where('customer_code', 'like', '%' . $searchValue . '%')
-                 ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                 ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-                 ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
-                 ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
-                 ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
-         })
-         ->distinct('customers.id')
-         ->count('customers.id as allcount');
+        }
 
 
+        // Total records with filter
+        $totalRecordswithFilter = DB::table('customers')
+            ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
+            ->whereRaw($filter)
+            ->where(function ($query) use ($searchValue) {
+                $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
+            })
+            ->distinct('customers.id')
+            ->count('customers.id as allcount');
 
-            
+
+
+
 
         // Fetch records
         $records = DB::table('customers')
-                ->orderBy($columnName, $columnSortOrder)
-                ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
-                ->whereRaw($filter)
-                ->where(function ($query) use ($searchValue) {
-                    $query->where('customer_code', 'like', '%' . $searchValue . '%')
-                          ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
-                          ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
-                          ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
-                          ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
-                          ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
-                })
-                ->select('customers.*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"), DB::raw("sum(invoice_grand_total) as total_invoice"), DB::raw('COUNT(invoices.id) as invoice_count') )
-                ->groupBy('customers.id')
-                ->skip($start)
-                ->take($rowperpage)
-                ->get();
+            ->orderBy($columnName, $columnSortOrder)
+            ->join('invoices', 'invoices.customer_id', '=', 'customers.id')
+            ->whereRaw($filter)
+            ->where(function ($query) use ($searchValue) {
+                $query->where('customer_code', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_phone', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_email', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_amount_due', 'like', '%' . $searchValue . '%')
+                    ->orWhere('customer_invoice_due', 'like', '%' . $searchValue . '%');
+            })
+            ->select('customers.*', DB::raw("(customer_amount_due + customer_invoice_due) as total_dues"), DB::raw("sum(invoice_grand_total) as total_invoice"), DB::raw('COUNT(invoices.id) as invoice_count'))
+            ->groupBy('customers.id')
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
 
         $data_arr = array();
 
@@ -173,8 +173,8 @@ class CustomerController extends Controller
             $invoice_count = $record->invoice_count;
 
 
-            if($customer_amount_due > 0){
-                $paypreviousdue = "   <a class='dropdown-item' onclick='show_pay_previous(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>Pay Previous Due</a>";
+            if ($customer_amount_due > 0) {
+                $paypreviousdue = "   <a class='dropdown-item' onclick='show_pay_previous(" . $id . ")' href='#' ><i class='fa fa-money-bill mr-2'></i>Pay Previous Due</a>";
             }
 
             $data_arr[] = array(
@@ -189,20 +189,19 @@ class CustomerController extends Controller
                 "customer_invoice_due"  =>  $customer_invoice_due,
                 "customer_invoice_due"  =>  $customer_invoice_due,
                 "total_dues"             =>  $total_dues,
-                "action"                =>  ($id <> 1)? "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
+                "action"                => ($id <> 1) ? "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
                 <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                ".$paypreviousdue."
+                <a class='dropdown-item' onclick='view_transactions(" . $id . ")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
+                " . $paypreviousdue . "
                 <div class='dropdown-divider'></div>
                 <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
                 </div></div>" :
                     "<div class='btn-group'><button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button><div class='dropdown-menu' role='menu'>
                 <a class='dropdown-item edit-button' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                <a class='dropdown-item' onclick='view_transactions(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
-                ".$paypreviousdue."
-                </div></div>" ,
+                <a class='dropdown-item' onclick='view_transactions(" . $id . ")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Transactions</a>
+                " . $paypreviousdue . "
+                </div></div>",
             );
-   
         } //end foreach
 
         $response = array(
@@ -235,17 +234,17 @@ class CustomerController extends Controller
     // VIEW TRANSACTIONS
     ////////////////////////////////////////////
 
-    public function transactions(Request $request){
+    public function transactions(Request $request)
+    {
         $customer_id = $request->id;
         $customers = Customer::where('id', $customer_id)->get();
-        foreach ($customers as $customer){
+        foreach ($customers as $customer) {
             $customer_name = $customer->customer_name;
             $customer_code = $customer->customer_code;
             $customer_phone = $customer->customer_phone;
             $customer_email = $customer->customer_email;
-
         }
-       
+
         $invoices = Invoice::where('customer_id', $customer_id)->get();
 
         $transaction_details = '';
@@ -257,59 +256,58 @@ class CustomerController extends Controller
 
             $total_invoice = 0;
             $total_payment = 0;
-            $total_due= 0;
-           
+            $total_due = 0;
+
 
             foreach ($invoices as $key => $invoice) {
-                    $total_invoice += $invoice->invoice_grand_total;
-                    $total_payment += $invoice->invoice_amount_paid;
-                    $total_due += $invoice->invoice_amount_due;
-                    
-                    if($invoice->payment_status == "paid"){
-                        $pstatus_class = "badge-success";
-                    } else if ($invoice->payment_status == "partial"){
-                        $pstatus_class = "badge-warning";
-                    } else {
-                        $pstatus_class = "badge-danger";
-                    }
-                    
+                $total_invoice += $invoice->invoice_grand_total;
+                $total_payment += $invoice->invoice_amount_paid;
+                $total_due += $invoice->invoice_amount_due;
 
-                $transaction_details = $transaction_details . '<tr id="invoice_'.$invoice->id.'" class="invoice_row">
-                                  <td>'.++$key.'</td>
-                                  <td>'.Carbon::parse($invoice->invoice_date)->format('d-m-Y').'</td>
-                                  <td class="text-right pr-2"> '.$invoice->invoice_code.'</td> 
-                                  <td class="text-right pr-2"> ₦ <span class="grandtotal_row">'.number_format($invoice->invoice_grand_total,2,).'</span></td>
-                                   <td class="text-right pr-2"> ₦ <span class="payment_row">'.number_format($invoice->invoice_amount_paid,2,).'</span></td>
-                                  <td class="text-right pr-2"> ₦ <span class="amountdue_row">'.number_format($invoice->invoice_amount_due,2,).'</span></td>
-                                  <td><span class="badge '.$pstatus_class .'"> '.$invoice->payment_status.'</span></td>
+                if ($invoice->payment_status == "paid") {
+                    $pstatus_class = "badge-success";
+                } else if ($invoice->payment_status == "partial") {
+                    $pstatus_class = "badge-warning";
+                } else {
+                    $pstatus_class = "badge-danger";
+                }
+
+
+                $transaction_details = $transaction_details . '<tr id="invoice_' . $invoice->id . '" class="invoice_row">
+                                  <td>' . ++$key . '</td>
+                                  <td>' . Carbon::parse($invoice->invoice_date)->format('d-m-Y') . '</td>
+                                  <td class="text-right pr-2"> ' . $invoice->invoice_code . '</td> 
+                                  <td class="text-right pr-2"> ₦ <span class="grandtotal_row">' . number_format($invoice->invoice_grand_total, 2,) . '</span></td>
+                                   <td class="text-right pr-2"> ₦ <span class="payment_row">' . number_format($invoice->invoice_amount_paid, 2,) . '</span></td>
+                                  <td class="text-right pr-2"> ₦ <span class="amountdue_row">' . number_format($invoice->invoice_amount_due, 2,) . '</span></td>
+                                  <td><span class="badge ' . $pstatus_class . '"> ' . $invoice->payment_status . '</span></td>
                                   <td>
-                                  <a onclick="delete_invoice('.$invoice->id.')" class="pointer btn btn-sm btn-danger "><i class="fa fa-trash-alt"></i></a>
+                                  <a onclick="delete_invoice(' . $invoice->id . ')" class="pointer btn btn-sm btn-danger "><i class="fa fa-trash-alt"></i></a>
 
-                                  <a href="invoices/view/'.$invoice->id.'" class="pointer btn btn-sm btn-info "><i class="fa fa-eye"></i></a>
+                                  <a href="invoices/view/' . $invoice->id . '" class="pointer btn btn-sm btn-info "><i class="fa fa-eye"></i></a>
                                   </td>
                               </tr>';
             }
 
             $transaction_footer = "<tfoot><tr style='background-color:#f4f6f9 !important'>
             <td colspan=3 class='text-right'></td>
-             <td class='text-right'><span class='add_total_invoice'>".money_format($total_invoice)."</span></td>
-            <td class='text-right'><span class='add_total_payment'>".money_format($total_payment)."</span></td>
-            <td class='text-right'><span class='add_total_due'>".money_format($total_due)."</span></td>
+             <td class='text-right'><span class='add_total_invoice'>" . money_format($total_invoice) . "</span></td>
+            <td class='text-right'><span class='add_total_payment'>" . money_format($total_payment) . "</span></td>
+            <td class='text-right'><span class='add_total_due'>" . money_format($total_due) . "</span></td>
             <td></td>
             <td></td>
             </tr></tfoot>";
-
         }
 
-      
+
         $reponse = '<div class="row">
                 <div class="col-md-12">
                     <div class="row invoice-info">
                     <div class="col-sm-4 invoice-col">
                         Customer Information 
                         <address>
-                            <strong>'.$customer_name.'</strong><br>
-                            <strong>'.$customer_code.'</strong><br>
+                            <strong>' . $customer_name . '</strong><br>
+                            <strong>' . $customer_code . '</strong><br>
                             
                         </address>
                     </div>
@@ -318,8 +316,8 @@ class CustomerController extends Controller
                     <div class="col-sm-4 invoice-col">
                         Contact Information:
                         <address>
-                        Phone : <b>'.$customer_phone.'</b><br>
-                        Email :<b> '.$customer_email.'</b><br>
+                        Phone : <b>' . $customer_phone . '</b><br>
+                        Email :<b> ' . $customer_email . '</b><br>
                         </address>
                     </div>
                     <!-- /.col -->
@@ -347,11 +345,11 @@ class CustomerController extends Controller
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    '.$transaction_details.'
+                                    ' . $transaction_details . '
                                         
                                     </tbody>
 
-                                    '.$transaction_footer.'
+                                    ' . $transaction_footer . '
                                 </table>
                         
                             </div>
@@ -375,7 +373,7 @@ class CustomerController extends Controller
         $customer_id = $request->customer_id;
         $prev_amt_paid =  $request->prev_amt_paid;
         $prev_payment_method = $request->prev_payment_method;
-        
+
         DB::beginTransaction();
         try {
 
@@ -387,9 +385,8 @@ class CustomerController extends Controller
                 $customer->customer_amount_due = $customer->customer_amount_due - $prev_amt_paid;
                 $customer->save();
             }
-            
-            DB::commit();
 
+            DB::commit();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             return response()->json([
@@ -406,7 +403,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => $customer->customer_amount_due.' - Customer payment has been updated.',
+            'message' => $customer->customer_amount_due . ' - Customer payment has been updated.',
         ]);
     }
 
@@ -426,7 +423,7 @@ class CustomerController extends Controller
         $customer_amount_due = $request->customer_amount_due;
 
         try {
-           $data =  Customer::create([
+            $data =  Customer::create([
                 'count_id'           =>  $count_id,
                 'customer_code'      =>  $customer_code,
                 'customer_name'      =>  $customer_name,
@@ -450,8 +447,8 @@ class CustomerController extends Controller
 
         return response()->json([
             'status' => true,
-            'id'=> $data->id,
-            'text' => $customer_code . ' | '. $customer_name,
+            'id' => $data->id,
+            'text' => $customer_code . ' | ' . $customer_name,
             'message' => 'Customer has been created.',
         ]);
     }
@@ -515,8 +512,9 @@ class CustomerController extends Controller
     /////////////////////////////////////////////
     // CUSTOMER DELETE
     ////////////////////////////////////////////
-    public function delete($id){
-        
+    public function delete($id)
+    {
+
         //get the customer record
         $customer = Customer::with('invoices')->findOrFail($id);
         $total_previous_due = $customer->customer_amount_due;
@@ -524,9 +522,9 @@ class CustomerController extends Controller
         //get all invoices and account ENTRIES that belongs to the customer
         $invoices = $customer->invoices;
         $total_invoice_due = 0;
-        
-        $new_narrative = "Deleted Invoice from ".$customer->customer_code." | ". $customer->customer_name ;
-        
+
+        $new_narrative = "Deleted Invoice from " . $customer->customer_code . " | " . $customer->customer_name;
+
         DB::beginTransaction();
 
         try {
@@ -538,7 +536,6 @@ class CustomerController extends Controller
                     'customer_id' => 1,
                     'invoice_note' => $invoice->invoice_note . " - " . $new_narrative
                 ]);
-        
             }
 
             //update amount due on Walkin Customer
@@ -557,31 +554,23 @@ class CustomerController extends Controller
 
 
             DB::commit();
-            return (['status'=> 1, 'message' => ' - The Customer has been successfully deleted.']);
-
-        } catch(Exception $ex) {
+            return (['status' => 1, 'message' => ' - The Customer has been successfully deleted.']);
+        } catch (Exception $ex) {
 
             DB::rollBack();
-            return (['status'=> 0, 'message' => ' Oh Oh! Something went wrong.']);
+            return (['status' => 0, 'message' => ' Oh Oh! Something went wrong.']);
         }
-
-            
     }
 
-    public function autocomplete(){
+    public function autocomplete()
+    {
         $customers = Customer::select('customer_name')->get();
-        
+
         foreach ($customers as $customer) {
-            
-                $cust[] = $customer->customer_name;
-             
+
+            $cust[] = $customer->customer_name;
         }
 
         return json_encode($cust);
-         
-
-
     }
-
-
 }

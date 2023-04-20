@@ -47,6 +47,7 @@ class DashboardController extends Controller
 
     public function barchartdata(){
 
+        //SALES DATA
         $invoices = Invoice::select(
             DB::raw('sum(invoice_grand_total) as sales_total'), 
             DB::raw("DATE_FORMAT(invoice_date,'%m') as monthKey")
@@ -60,8 +61,9 @@ class DashboardController extends Controller
         foreach($invoices as $invoice){
             $salesdata[$invoice->monthKey-1] = $invoice->sales_total;
         }
+        
 
-       
+        // EXPENSES DATA
         $expenses = Expense::select(
             DB::raw('sum(expenses_amount) as expense_total'), 
             DB::raw("DATE_FORMAT(expenses_date,'%m') as monthKey")
@@ -75,9 +77,106 @@ class DashboardController extends Controller
         foreach($expenses as $expense){
             $expensedata[$invoice->monthKey-1] = $expense->expense_total;
         }
+
+
+        // COST OF SALES
+        $invoices = DB::table('invoices')
+        ->join('invoiceitems', 'invoices.id', '=', 'invoiceitems.invoice_id')
+        ->select(
+            'invoiceitems.product_name',
+            DB::raw('sum(invoiceitems.width * invoiceitems.height) as material'), 
+            DB::raw("DATE_FORMAT(invoices.invoice_date,'%m') as monthKey")
+        )
+        ->whereYear('invoices.invoice_date', date('Y'))
+        ->groupBy('monthKey', 'invoiceitems.product_name')
+        ->orderBy('monthKey', 'ASC')
+        ->get();
+
+
         
+        // return response()->json($invoiceItems);
+
+      
+                $flex_cost = 0;
+                $sav_cost = 0;
+                $material = 0;
+
+                $costdata = [0,0,0,0,0,0,0,0,0,0,0,0];
+                foreach ($invoices as $invoice){
+                  
+                        $material = ($invoice->material);
+
+                        if ($invoice->product_name=="Flex") $flex_cost = ($material * 64.5 * 1.2 ); 
+                        if ($invoice->product_name=="SAV") $sav_cost = ($material * 60.5 * 1.2 ); // material & ink cost
+                         
+                         
+                         $costdata[$invoice->monthKey-1] = $sav_cost + $flex_cost;
+
+                         
+                }    
 
 
+                 //add utilities
+                 $utilities = DB::table('expense_categories')
+                 ->join('expenses', 'expense_categories.id', '=', 'expenses.category_id')
+                 ->select(
+                     'expense_categories.category_name',
+                     DB::raw('sum(expenses.expenses_amount) as expenses_total'), 
+                     DB::raw("DATE_FORMAT(expenses.expenses_date,'%m') as monthKey")
+                 )->where('expense_categories.category_name', 'Utilities')
+                 ->whereYear('expenses.expenses_date', date('Y'))
+                 ->groupBy('monthKey', 'expense_categories.category_name')
+                 ->orderBy('monthKey', 'ASC')
+                 ->get();
+
+                 $utilitiesdata = [0,0,0,0,0,0,0,0,0,0,0,0];
+                foreach ($utilities as $utility){
+                  
+                        $utilitycost = ($utility->expenses_total);
+                        $utilitiesdata[$utility->monthKey-1] = $utilitycost;
+                         
+                }    
+
+
+
+
+                //add Salary
+                $salaries = DB::table('expense_categories')
+                ->join('expenses', 'expense_categories.id', '=', 'expenses.category_id')
+                ->select(
+                    'expense_categories.category_name',
+                    DB::raw('sum(expenses.expenses_amount) as expenses_total'), 
+                    DB::raw("DATE_FORMAT(expenses.expenses_date,'%m') as monthKey")
+                )->where('expense_categories.category_name', 'Salaries')
+                ->whereYear('expenses.expenses_date', date('Y'))
+                ->groupBy('monthKey', 'expense_categories.category_name')
+                ->orderBy('monthKey', 'ASC')
+                ->get();
+
+                $salarydata = [0,0,0,0,0,0,0,0,0,0,0,0];
+               foreach ($salaries as $salary){
+                 
+                       $salarycost = ($salary->expenses_total);
+                       $salarydata[$salary->monthKey-1] = $salarycost;
+                        
+               }    
+
+
+                
+
+               ///////////// ADD ALL COSTS OF SALE (material, utility, salary)
+
+                $totalcostdata = [0,0,0,0,0,0,0,0,0,0,0,0];
+                foreach ($utilitiesdata as $key=>$loop){
+                  
+                    $totalcostdata[$key] = $loop + $costdata[$key] + $salarydata[$key];
+                     
+                }    
+              
+
+
+
+        //SAV & FLEX TOTALS
         $sav_total = Invoiceitem::where('product_name', 'SAV')->sum('total_amount');
         $flex_total = Invoiceitem::where('product_name', 'Flex')->sum('total_amount');
         
@@ -85,17 +184,23 @@ class DashboardController extends Controller
         $totals[] = number_format($sav_total,2,'.', '');
         
        
+        //MONTH LABELS
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         foreach ($months as &$value) {
             $value = $value." '". date('y');
         }
+
+
+
         $data = array(
             "months" => $months,
             "sales" => $salesdata,
             "expenses" => $expensedata,
             "totals" => $totals,
+            "cost"=> $totalcostdata
         );
 
+      
         return response()->json($data);
     }
 

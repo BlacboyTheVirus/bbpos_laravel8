@@ -20,6 +20,9 @@
                 <div class="col-sm-6">
                     <h1 class="m-0">{{ __('Dashboard') }}</h1>
                 </div><!-- /.col -->
+
+                <div class="col-sm-6 pull-right" style="text-align: right"><h5> {{date('l, jS F, Y')}} </h5></div>
+                
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>
@@ -339,12 +342,25 @@
                         pointHighlightFill  : '#fff',
                         pointHighlightStroke: 'rgba(220,220,220,1)',
                     },
+
+                    {
+                        label               : 'Cost',
+                        backgroundColor     : '#ff0000',
+                        borderColor         : '#ff0000',
+                        pointRadius         : false,
+                        pointColor          : '#ff0000',
+                        pointStrokeColor    : '#c1c7d1',
+                        pointHighlightFill  : '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                    },
                 ]
             };
 
             barChartData.labels= data.months;
             barChartData.datasets[0].data = data.sales ;
             barChartData.datasets[1].data = data.expenses;
+            barChartData.datasets[2].data = data.cost;
+
 
 
             new Chart($("#barChart").get(0).getContext("2d"), {

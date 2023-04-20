@@ -63,7 +63,7 @@
 
                                     <div class="card-tools">
                                         <a class="btn btn-block btn-success"  href="{{ route('invoices.create') }}">
-                                            <i class="fa fa-plus"></i> New Invoice
+                                            <i class="fa fa-cart-plus"></i> New Invoice
                                         </a>
                                     </div>
 

@@ -10,6 +10,10 @@
   <script src="{{ asset('plugins/pace-progress/pace.min.js') }}"></script>
   <link rel="stylesheet" href="{{ asset('css/pace_flash.css') }}">
 
+   <!-- FAVICONS ICON -->
+   <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/x-icon">
+   <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/favicon.png') }}">
+
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -75,6 +79,13 @@
               <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
               </li>
+              
+              <li class="nav-item d-none d-sm-inline-block">
+                
+                <a href="{{route('invoices.create')}}" class="btn btn-success"> <i class="fa fa-cart-plus nav-icon"></i> New Invoice</a>
+              </li>
+              
+              
               {{-- <li class="nav-item d-none d-sm-inline-block">
                 <a href="../../index3.html" class="nav-link">Home</a>
               </li>
