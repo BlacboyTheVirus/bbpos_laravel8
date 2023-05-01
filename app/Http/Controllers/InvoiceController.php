@@ -620,29 +620,28 @@ if ($old_customer_id != $customer_id){
             $invoice_amount_due = $record->invoice_amount_due;
             $invoice_payment_status = ucfirst($record->payment_status);
             $created_by = ucfirst($record->created_by);
-
         
           
-                $data_arr[] = array(
-                    "invoice_date"                  =>  $invoice_date,
-                        "invoice_code"              =>  $invoice_code,
-                        "customer_name"             =>  $invoice_customer_name,
-                        "invoice_grand_total"       =>  $invoice_grand_total,
-                        "invoice_amount_paid"       =>  $invoice_amount_paid,
-                        "invoice_amount_due"        =>  $invoice_amount_due,
-                        "payment_status"            =>  $invoice_payment_status,
-                        "created_by"                =>  $created_by,
-                        "action"                    =>  "<div class='btn-group'>
-                        <button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button>
-                        <div class='dropdown-menu' role='menu'>
-                        <a class='dropdown-item' id= '" . $id . "' href='view/" .  $id . "'  ><i class= 'fas fa-eye mr-2'></i>View Invoice</a>
-                        <a class='dropdown-item' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
-                        <a class='dropdown-item' onclick='view_payments(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Payments</a><div class='dropdown-divider'>
-                        </div>
-                        <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
-                        </div>
-                        </div>" ,
-                );
+            $data_arr[] = array(
+                "invoice_date"                  =>  $invoice_date,
+                    "invoice_code"              =>  $invoice_code,
+                    "customer_name"             =>  $invoice_customer_name,
+                    "invoice_grand_total"       =>  $invoice_grand_total,
+                    "invoice_amount_paid"       =>  $invoice_amount_paid,
+                    "invoice_amount_due"        =>  $invoice_amount_due,
+                    "payment_status"            =>  $invoice_payment_status,
+                    "created_by"                =>  $created_by,
+                    "action"                    =>  "<div class='btn-group'>
+                    <button type='button' class='btn btn-sm btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown'>Action <span class='sr-only'>Toggle Dropdown</span></button>
+                    <div class='dropdown-menu' role='menu'>
+                    <a class='dropdown-item' id= '" . $id . "' href='view/" .  $id . "'  ><i class= 'fas fa-eye mr-2'></i>View Invoice</a>
+                    <a class='dropdown-item' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
+                    <a class='dropdown-item' onclick='view_payments(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Payments</a><div class='dropdown-divider'>
+                    </div>
+                    <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
+                    </div>
+                    </div>" ,
+            );
          
 
 
@@ -652,7 +651,7 @@ if ($old_customer_id != $customer_id){
             "draw" => intval($draw),
             "iTotalRecords" => $totalRecords,
             "iTotalDisplayRecords" => $totalRecordswithFilter,
-            "aaData" => $data_arr
+            "aaData" => $data_arr,
         );
 
         return response()->json($response);

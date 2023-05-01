@@ -76,6 +76,83 @@
                         
                         <div class="card-body">
 
+                            <div class="row">
+
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-info">
+                                        <div class="inner">
+                                            <h3 class="font-weight-bold"><sup style="font-size: 20px">₦</sup>
+                                                <span id="invoice_amount">0.00</span></h3>
+                                            
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </div>
+                                        <div  class="small-box-footer">
+                                            Invoice Amount
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-success">
+                                        <div class="inner">
+                                            <h3 class="font-weight-bold"><sup style="font-size: 20px">₦</sup>
+                                                <span id="invoice_payment">0.00</span></h3>
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-money-bill-wave-alt"></i>
+                                        </div>
+
+                                        <div  class="small-box-footer">
+                                            Invoice Payments
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-danger">
+                                        <div class="inner">
+                                            <h3 class="font-weight-bold"><sup style="font-size: 20px">₦</sup>
+                                                <span id="invoice_due">0.00</span></h3>
+                                           </div>
+                                        <div class="icon">
+                                            <i class="fa fa-credit-card"></i>
+                                        </div>
+
+                                        <div  class="small-box-footer">
+                                            Invoice Due
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-lg-3 col-6">
+                                    <div class="small-box bg-gradient-primary">
+                                        <div class="inner">
+                                            <h3 class="font-weight-bold"><sup style="font-size: 20px">&nbsp;</sup>
+                                                <span id="invoice_count">0</span></h3>
+                                        
+                                        </div>
+                                        <div class="icon">
+                                            <i class="fa fa-credit-card"></i>
+                                        </div>
+                                        <div  class="small-box-footer">
+                                            Total Invoices
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+
+                                
+                            </div> <!-- ROW -->
+
+
+                            
+
                             <div class="row pb-2 mb-3">
                                
                                     <div class="col-md-3">
@@ -313,34 +390,45 @@
                     dom: '<"row" <"col-md-3"l> <"#top.col-md-6">  <"col-md-3"f> > rt <"row"  <"col-md-6"i> <"col-md-6"p> ><"clear">',
                     "initComplete": function(settings, json) {
                                     $(this).DataTable().buttons().container()
-                                    .appendTo( ('#top'));
-                                    
+                                        .appendTo( ('#top'));
                                     },
                     
-                                    drawCallback: function () {
-                                        var api = this.api();
-                                        var sum = 0;
-                                        var formated = 0;
-                                        //to show first th
-                                        $(api.column(2).footer()).html('Total');
+                        drawCallback: function (json) {
+                            var api = this.api();
+                            var sum = 0;
+                            var formated = 0;
+                            //to show first th
+                            $(api.column(2).footer()).html('Total');
 
-                                            sum = api.column(3, {page:'current'}).data().sum();
-                                            //to format this sum
-                                            formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
-                                            $(api.column(3).footer()).html('₦ '+ formated);
+                                sum = api.column(3, {page:'current'}).data().sum();
+                                //to format this sum
+                                unformated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:0});
+                                formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
+                                $(api.column(3).footer()).html('₦ '+ formated);
+                                $('#invoice_amount').html(unformated);
 
-                                            sum = api.column(4, {page:'current'}).data().sum();
-                                            //to format this sum
-                                            formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
-                                            $(api.column(4).footer()).html('₦ '+ formated);
+                                sum = api.column(4, {page:'current'}).data().sum();
+                                //to format this sum
+                                unformated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:0});
+                                formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
+                                $(api.column(4).footer()).html('₦ '+ formated);
+                                $('#invoice_payment').html(unformated)
 
-                                            sum = api.column(5, {page:'current'}).data().sum();
-                                            //to format this sum
-                                            formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
-                                            $(api.column(5).footer()).html('₦ '+ formated);
-                                        
-		                             }
-                        
+                                sum = api.column(5, {page:'current'}).data().sum();
+                                //to format this sum
+                                unformated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:0});
+                                formated = parseFloat(sum).toLocaleString(undefined, {minimumFractionDigits:2});
+                                $(api.column(5).footer()).html('₦ '+ formated);
+                                $('#invoice_due').html(unformated)
+
+
+                                $('#invoice_count').html(table.data().count())
+
+                                
+                            
+                            },
+                                    
+                                                        
                    
                 }); // end DataTable
             

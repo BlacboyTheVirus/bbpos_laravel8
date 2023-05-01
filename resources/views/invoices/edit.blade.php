@@ -292,7 +292,7 @@
                                                             <td>{{ $payment->payment_date }}</td>
                                                             <td>{{ $payment->payment_type }}</td>
                                                             <td>{{ $payment->payment_note }}</td>
-                                                            <td class="text-right pr-4 payment_row">{{ number_format($payment->amount, 2, '.', ',') }} </td>
+                                                            <td class="text-right pr-4 payment_row">{{ number_format($payment->amount, 0, '', ',') }} </td>
                                                             <td class="text-center"><a class="btn btn-sm" onclick="delete_payment({{$payment->id}})"><i class="fas fa-trash-alt text-red"></i></a></td>
                                                         </tr>
     
@@ -306,7 +306,7 @@
                                                             <th></th>
                                                             <th></th>
                                                             <th>Total</th>
-                                                            <th id="total_payment" class="text-right pr-4">{{ money_format($total_payment)}}</th>
+                                                            <th  class="text-right pr-4"> N <span id="total_payment">{{ number_format($total_payment)}} </span></th>
                                                             
                                                         </tr>
                                                     </tfoot>
@@ -523,9 +523,11 @@
                 }
 
                 if ($('#amount_paid').val() == "" ) $('#amount_paid').val(0.00); 
-
+                
+                 init_payment = parseFloat($('#total_payment').html().replace(/,/g, ''));
+                 
                 //check that Walk-In Customer makes full payment
-                if ( $('#customer-id').val() == 1 && $('#amount_paid').val() < grandtotal ){
+                if ( $('#customer-id').val() == 1 && ( parseFloat($('#amount_paid').val()) + init_payment ) < grandtotal ){
                         toastr.error("Walk-In Customer must make full payment.");
                         return false;
                 } else {

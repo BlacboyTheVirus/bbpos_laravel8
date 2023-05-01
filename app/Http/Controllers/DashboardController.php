@@ -73,11 +73,18 @@ class DashboardController extends Controller
         ->orderBy('monthKey', 'ASC')
         ->get();
 
+       
         $expensedata = [0,0,0,0,0,0,0,0,0,0,0,0];
         foreach($expenses as $expense){
-            $expensedata[$invoice->monthKey-1] = $expense->expense_total;
+            $expensedata[$expense->monthKey-1] = $expense->expense_total;
         }
 
+
+
+
+
+
+        
 
         // COST OF SALES
         $invoices = DB::table('invoices')
@@ -106,8 +113,8 @@ class DashboardController extends Controller
                   
                         $material = ($invoice->material);
 
-                        if ($invoice->product_name=="Flex") $flex_cost = ($material * 64.5 * 1.2 ); 
-                        if ($invoice->product_name=="SAV") $sav_cost = ($material * 60.5 * 1.2 ); // material & ink cost
+                        if ($invoice->product_name=="Flex") $flex_cost = ($material * 68 * 1.2 ); 
+                        if ($invoice->product_name=="SAV") $sav_cost = ($material * 64 * 1.2 ); // material & ink cost
                          
                          
                          $costdata[$invoice->monthKey-1] = $sav_cost + $flex_cost;
@@ -152,6 +159,7 @@ class DashboardController extends Controller
                 ->groupBy('monthKey', 'expense_categories.category_name')
                 ->orderBy('monthKey', 'ASC')
                 ->get();
+
 
                 $salarydata = [0,0,0,0,0,0,0,0,0,0,0,0];
                foreach ($salaries as $salary){
