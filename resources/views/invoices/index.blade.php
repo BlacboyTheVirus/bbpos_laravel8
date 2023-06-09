@@ -525,6 +525,44 @@
                 
         }    
         
+
+
+
+          ////////////////////////////////////////
+        /// DELETE INVOICE
+        ////////////////////////////////////
+                            
+        function delete_invoice(id){
+            
+            if (confirm("Do you want to delete the Invoice?") == true) {
+                $.ajax({
+                    url: "/invoices/delete/"+id,
+                    type: "get", //send it through get method
+                    // data: { 
+                    //     'id': id, 
+                    // },
+                    success: function(response) {
+                        if (response.status == 1){
+                            failed_sound.currentTime = 0;
+                            failed_sound.play();
+
+                            $('#invoiceTable').DataTable().ajax.reload();                            
+                            toastr.success(response.message);
+                            
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    
+                    },
+                    error: function(xhr) {
+                        toastr.error('Ooopsy! Something unintended just happened. ')
+                    }
+                }); // end ajax
+            }
+                
+        }
+
+
         
          ////////////////////////////////////////
         /// DELETE PAYMENT

@@ -369,7 +369,9 @@ if ($old_customer_id != $customer_id){
 // DELETE INVOICE 
 /////////////////////////////////////////////////////////
 
-    public function delete($id){
+    public function delete(Request $request){
+
+        $id= $request->id;
     $invoice = Invoice::findOrFail($id);
 
     $grandtotal = $invoice->invoice_grand_total;
@@ -379,8 +381,6 @@ if ($old_customer_id != $customer_id){
 
     DB::beginTransaction();
     try {
-
-        
 
         //Delete Invoice Items
         $invoice->invoiceitems()->delete();
@@ -392,10 +392,10 @@ if ($old_customer_id != $customer_id){
         $invoice->delete();
 
         //subtract InvoiceDue from Customer Table
-        $customer = Customer::find($customer_id);
-        $customer->update([
-            'customer_invoice_due' => $customer->customer_invoice_due  -  $amountdue
-        ]);
+        // $customer = Customer::find($customer_id);
+        // $customer->update([
+        //     'customer_invoice_due' => $customer->customer_invoice_due  -  $amountdue
+        // ]);
 
         
         DB::commit();
@@ -638,7 +638,7 @@ if ($old_customer_id != $customer_id){
                     <a class='dropdown-item' id= '" . $id . "' href='edit/" .  $id . "'  ><i class= 'fas fa-edit mr-2'></i>Edit</a>
                     <a class='dropdown-item' onclick='view_payments(".$id.")' href='#' ><i class='fa fa-money-bill mr-2'></i>View Payments</a><div class='dropdown-divider'>
                     </div>
-                    <a class='dropdown-item' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
+                    <a class='dropdown-item' onclick='delete_invoice(".$id.")' href='#'><i class='far fa-trash-alt mr-2 text-danger'></i>Delete</a>
                     </div>
                     </div>" ,
             );

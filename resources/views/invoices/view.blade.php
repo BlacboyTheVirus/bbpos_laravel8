@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-<title>{{ config('app.name', 'Laravel') }} - Invoice</title>
+    <title>{{ config('app.name', 'Laravel') }} - Invoice</title>
 @endsection
 
 @section('styles')
@@ -137,9 +137,11 @@
                                                 <td>{{ number_format($item->width, 2, '.', '') . ' X ' . number_format($item->height, 2, '.', '') }}
                                                 </td>
                                                 <td>{{ $item->unit_price }}</td>
-                                                <td class="text-right">{{ number_format($item->unit_amount, 2, '.', ',') }}</td>
+                                                <td class="text-right">{{ number_format($item->unit_amount, 2, '.', ',') }}
+                                                </td>
                                                 <td class="text-center">{{ $item->quantity }}</td>
-                                                <td class="text-right">{{ number_format($item->total_amount, 2, '.', ',') }}</td>
+                                                <td class="text-right">
+                                                    {{ number_format($item->total_amount, 2, '.', ',') }}</td>
                                             </tr>
                                         @endforeach
 
@@ -156,58 +158,94 @@
 
                                 <h3 class="card-title lead mb-2 font-weight-bold">Payment Details</h3>
 
-                                        <div class="table table-responsive ">
-                                            <table class="table text-nowrap table-condensed table-bordered table-hover">
-                                                <thead>
-                                                    <tr class="bg-gray-light">
-                                                        <th>#</th>
-                                                        <th>Date</th>
-                                                        <th>Type</th>
-                                                        <th class="text-center" width="30%">Note</th>
-                                                        <th class="text-center">Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @php
-                                                        $total_payment = 0; 
-                                                    @endphp
+                                <div class="table table-responsive ">
+                                    <table class="table text-nowrap table-condensed table-bordered table-hover">
+                                        <thead>
+                                            <tr class="bg-gray-light">
+                                                <th>#</th>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th class="text-center" width="30%">Note</th>
+                                                <th class="text-center">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $total_payment = 0;
+                                            @endphp
 
-                                                    @foreach ($invoice->payments as $key=>$payment)
-                                                        @php
-                                                            $total_payment = $total_payment + $payment->amount;
-                                                        @endphp
-                                                        
-                                                        <tr>
-                                                            <td> {{ ++$key }}</td>
-                                                            <td>{{ $payment->payment_date }}</td>
-                                                            <td>{{ $payment->payment_type }}</td>
-                                                            <td>{{ $payment->payment_note }}</td>
-                                                            <td class="text-right pr-3"> {{ number_format($payment->amount, 2, '.', ',') }} </td>
-                                                        </tr>
+                                            @foreach ($invoice->payments as $key => $payment)
+                                                @php
+                                                    $total_payment = $total_payment + $payment->amount;
+                                                @endphp
 
-                                                    @endforeach
+                                                <tr>
+                                                    <td> {{ ++$key }}</td>
+                                                    <td>{{ $payment->payment_date }}</td>
+                                                    <td>{{ $payment->payment_type }}</td>
+                                                    <td>{{ $payment->payment_note }}</td>
+                                                    <td class="text-right pr-3">
+                                                        {{ number_format($payment->amount, 2, '.', ',') }} </td>
+                                                </tr>
+                                            @endforeach
 
 
 
-                                                    <tfoot>
-                                                        <tr class="bg-gray-light">
-                                                            <th></th>
-                                                            <th></th>
-                                                            <th></th>
-                                                            <th><b>Total</b></th>
-                                                            <th class="text-right pr-3">{{ money_format($total_payment) }}</th>
-                                                        </tr>
-                                                    </tfoot>
-                                                   
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        <tfoot>
+                                            <tr class="bg-gray-light">
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th><b>Total</b></th>
+                                                <th class="text-right pr-3">{{ money_format($total_payment) }}</th>
+                                            </tr>
+                                        </tfoot>
 
-                               
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                            Bank Account Details
+                                        </h3>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <table class="table text-nowrap table-condensed no-border">
+                                            <thead class=" text-bold">
+                                                <tr>
+                                                    <td>Account Name</td>
+                                                    <td>Account Number</td>
+                                                    <td>Bank</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Blacboy Kreative</td>
+                                                    <td>0022262582</td>
+                                                    <td>GTBank Plc</td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                        
+                                        
+                                        
+                                    </div>
+
+                                </div>
+
+
 
                             </div>
 
                             <div class=" order-1 order-sm-2 p-2  col-md-5 offset-2">
+
+
                                 <div class="table-responsive">
                                     <table class="table text-right">
                                         <tbody>
@@ -234,13 +272,14 @@
                                             <tr>
                                                 <th>Total : </th>
                                                 <td>&nbsp;</td>
-                                                <td>₦ {{ number_format($invoice->invoice_grand_total, 2, '.', ',') }} </td>
+                                                <td style="font-weight: 700; font-size:1.5rem">₦ {{ number_format($invoice->invoice_grand_total, 2, '.', ',') }} </td>
 
                                             </tr>
 
                                         </tbody>
                                     </table>
                                 </div>
+
 
 
                             </div>
@@ -252,7 +291,7 @@
 
                         <div class="row no-print">
                             <div class="col-12">
-                                <a href="{{ route('invoices.edit', [$invoice->id]) }}" class="btn btn-success">
+                                <a href="{{ route('invoices.edit', [$invoice->id]) }}" class="btn btn-warning">
                                     <i class="fas fa-edit"></i>Edit Invoice
                                 </a>
 
@@ -260,7 +299,7 @@
                                     <i class="fas fa-print"></i> Print Invoice
                                 </button>
 
-                                <button type="button" class="btn btn-success float-right">
+                                <button type="button" class="btn btn-default float-right">
                                     <i class="far fa-credit-card"></i> Print POS Receipt
                                 </button>
 
